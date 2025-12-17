@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8" />
+	<title>Álbumes disponibles</title>
+</head>
+<body>
+	<h1>Álbumes disponibles</h1>
+
+	<p>
+		<a th:href="@{'/vista/albumes/nuevo'}">Crear nuevo álbum</a>
+	</p>
+
+	<p th:if="${albumes.isEmpty()}">Aún no he creado ningún álbum.</p>
+
+	<ul th:if="${!albumes.isEmpty()}">
+		<li th:each="album : ${albumes}">
+			<a th:href="@{'/vista/albumes/' + ${album.id}}" th:text="${album.nombre}"></a>
+			<span th:text="' (' + ${album.anio} + ')'">(año)</span>
+			|
+			<a th:href="@{'/vista/albumes/' + ${album.id} + '/editar'}">Editar</a>
+			|
+			<form th:action="@{'/vista/albumes/' + ${album.id} + '/eliminar'}" method="post" style="display:inline">
+				<button type="submit" onclick="return confirm('¿Seguro que deseas eliminar este álbum y sus láminas?');">Eliminar</button>
+			</form>
+		</li>
+	</ul>
+</body>
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8" />
+	<title th:text="${album.nombre}">Detalle de álbum</title>
+</head>
+<body>
+	<h1 th:text="${album.nombre}">Nombre del álbum</h1>
+	<p>
+		<strong>Año:</strong> <span th:text="${album.anio}"></span><br />
+		<strong>Fecha de lanzamiento:</strong> <span th:text="${album.fechaLanzamiento}"></span><br />
+		<strong>Descripción:</strong> <span th:text="${album.descripcion}"></span><br />
+		<strong>Cantidad total de láminas:</strong> <span th:text="${album.cantidadTotalLaminas}"></span>
+	</p>
+
+	<h2>Opciones para este álbum</h2>
+	<ul>
+		<li>
+			<a th:href="@{'/vista/albumes/' + ${album.id} + '/laminas'}">Gestionar láminas</a>
+		</li>
+		<li>
+			<a th:href="@{'/vista/albumes/' + ${album.id} + '/laminas/faltantes'}">Ver láminas faltantes</a>
+		</li>
+		<li>
+			<a th:href="@{'/vista/albumes/' + ${album.id} + '/laminas/repetidas'}">Ver láminas repetidas</a>
+		</li>
+		<li>
+			<a th:href="@{'/vista/albumes/' + ${album.id} + '/laminas/nueva'}">Agregar lámina individual</a>
+		</li>
+		<li>
+			<a th:href="@{'/vista/albumes/' + ${album.id} + '/laminas/lote'}">Agregar láminas por lote</a>
+		</li>
+		<li>
+			<a th:href="@{'/vista/albumes/' + ${album.id} + '/laminas'}">Eliminar láminas</a>
+		</li>
+	</ul>
+
+	<p>
+		<a href="/vista/">Volver al listado de álbumes</a>
+	</p>
+</body>
+</html>

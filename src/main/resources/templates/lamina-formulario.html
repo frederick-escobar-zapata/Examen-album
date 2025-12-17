@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8" />
+	<title th:text="${modoEdicion} ? 'Editar lámina' : 'Nueva lámina'">Lámina</title>
+</head>
+<body>
+	<h1 th:text="${modoEdicion} ? 'Editar lámina' : 'Nueva lámina'">Lámina</h1>
+
+	<p th:if="${mensajeError}" th:text="${mensajeError}" style="color: red;"></p>
+
+	<form th:action="${modoEdicion} ? @{'/vista/albumes/' + ${album.id} + '/laminas/' + ${lamina.id} + '/editar'} : @{'/vista/albumes/' + ${album.id} + '/laminas'}" method="post" th:object="${lamina}">
+		<label>Número:</label>
+		<input type="number" th:field="*{numero}" required />
+		<br />
+
+		<label>Tipo:</label>
+		<select th:field="*{tipo}">
+			<option th:value="NORMAL">NORMAL</option>
+			<option th:value="ESPECIAL">ESPECIAL</option>
+			<option th:value="ESCUDO">ESCUDO</option>
+		</select>
+		<br />
+
+		<div th:if="${modoEdicion}">
+			<label>Cantidad repetidas:</label>
+			<input type="number" th:field="*{cantidadRepetidas}" min="0" />
+			<br />
+		</div>
+
+		<label>URL de la foto:</label>
+		<input type="text" th:field="*{urlFoto}" />
+		<br />
+
+		<button type="submit" th:text="${modoEdicion} ? 'Guardar cambios' : 'Crear lámina'"></button>
+	</form>
+
+	<p>
+		<a th:href="@{'/vista/albumes/' + ${album.id} + '/laminas'}">Volver al listado de láminas</a>
+	</p>
+</body>
+</html>

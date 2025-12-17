@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8" />
+	<title th:text="'laminas repetidas de ' + ${album.nombre}">laminas repetidas</title>
+</head>
+<body>
+	<h1 th:text="'laminas repetidas de ' + ${album.nombre}">laminas repetidas</h1>
+
+	<p>
+		<a th:href="@{'/vista/albumes/' + ${album.id}}">Volver al laminas</a> |
+		<a th:href="@{'/vista/albumes/' + ${album.id} + '/laminas'}">Ver todas las laminas</a>
+	</p>
+
+	<table border="1" cellpadding="4" cellspacing="0">
+		<thead>
+			<tr>
+				<th>Numero</th>
+				<th>Tipo</th>
+				<th>Repetidas</th>
+				
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="lamina : ${laminasRepetidas}">
+				<td th:text="${lamina.numero}"></td>
+				<td th:text="${lamina.tipo}"></td>
+				<td th:text="${lamina.cantidadRepetidas}"></td>
+				
+			</tr>
+		</tbody>
+	</table>
+
+	<div th:if="${totalPaginas != null}">
+		<p>
+			<span th:text="'Página ' + (${paginaActual} + 1) + ' de ' + (${totalPaginas == 0} ? 1 : ${totalPaginas})"></span>
+		</p>
+		<p>
+			<span th:if="${paginaActual > 0}">
+				<a th:href="@{/vista/albumes/{id}/laminas/repetidas(id=${album.id},pagina=${paginaActual - 1})}">Anterior</a>
+			</span>
+			<span th:unless="${paginaActual > 0}">Anterior</span>
+
+			|
+
+			<span th:if="${paginaActual + 1 < totalPaginas}">
+				<a th:href="@{/vista/albumes/{id}/laminas/repetidas(id=${album.id},pagina=${paginaActual + 1})}">Siguiente</a>
+			</span>
+			<span th:unless="${paginaActual + 1 < totalPaginas}">Siguiente</span>
+		</p>
+	</div>
+</body>
+</html>

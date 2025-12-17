@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8" />
+	<title th:text="${album.id} == null ? 'Crear álbum' : 'Editar álbum'">Formulario de álbum</title>
+</head>
+<body>
+	<h1 th:text="${album.id} == null ? 'Crear nuevo álbum' : 'Editar álbum'"></h1>
+
+	<form th:action="${album.id} == null ? '/vista/albumes' : '/vista/albumes/' + ${album.id} + '/editar'" th:object="${album}" method="post">
+		<p>
+			<label for="nombre">Nombre:</label>
+			<input type="text" id="nombre" th:field="*{nombre}" required />
+		</p>
+		<p>
+			<label for="anio">Año:</label>
+			<input type="number" id="anio" th:field="*{anio}" min="0" />
+		</p>
+		<p>
+			<label for="fechaLanzamiento">Fecha de lanzamiento:</label>
+			<input type="date" id="fechaLanzamiento" th:field="*{fechaLanzamiento}" />
+		</p>
+		<p>
+			<label for="descripcion">Descripción:</label><br />
+			<textarea id="descripcion" th:field="*{descripcion}" rows="3" cols="40"></textarea>
+		</p>
+		<p>
+			<label for="cantidadTotalLaminas">Cantidad total de láminas:</label>
+			<input type="number" id="cantidadTotalLaminas" th:field="*{cantidadTotalLaminas}" min="0" />
+		</p>
+		<p>
+			<button type="submit">Guardar</button>
+			<a href="/vista/">Cancelar</a>
+		</p>
+	</form>
+</body>
+</html>

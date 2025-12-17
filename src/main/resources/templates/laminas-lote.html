@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8" />
+	<title th:text="'Carga por lote - ' + ${album.nombre}">Carga por lote</title>
+</head>
+<body>
+	<h1 th:text="'Carga por lote para ' + ${album.nombre}">Carga por lote</h1>
+
+	<p>En esta vista yo ingreso los números de las láminas separados por coma, punto y coma o espacios.</p>
+
+	<form th:action="@{'/vista/albumes/' + ${album.id} + '/laminas/lote'}" method="post">
+		<label for="tipoLamina">Tipo de láminas del lote:</label>
+		<select id="tipoLamina" name="tipoLamina">
+			<option value="NORMAL">Normal</option>
+			<option value="ESPECIAL">Especial</option>
+			<option value="ESCUDO">Escudo</option>
+		</select>
+		<br /><br />
+		<label>Listado de números de láminas:</label>
+		<br />
+		<textarea name="numerosLaminas" rows="6" cols="60" th:text="${numerosLaminas}"></textarea>
+		<br />
+		<button type="submit">Registrar láminas</button>
+	</form>
+
+	<p>
+		<a th:href="@{'/vista/albumes/' + ${album.id} + '/laminas'}">Volver al listado de láminas</a>
+	</p>
+</body>
+</html>
