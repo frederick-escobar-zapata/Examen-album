@@ -3,15 +3,19 @@ package ipss.cl.album.controlador;
 import ipss.cl.album.modelo.Album;
 import ipss.cl.album.modelo.EstadoLamina;
 import ipss.cl.album.modelo.Lamina;
+import ipss.cl.album.modelo.Usuario;
 import ipss.cl.album.repositorio.RepositorioAlbum;
 import ipss.cl.album.repositorio.RepositorioLamina;
+import ipss.cl.album.repositorio.RepositorioUsuario;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.Comparator;
@@ -23,26 +27,46 @@ public class ControladorLamina {
 
 	private final RepositorioAlbum repositorioAlbum;
 	private final RepositorioLamina repositorioLamina;
+	private final RepositorioUsuario repositorioUsuario;
 
-	public ControladorLamina(RepositorioAlbum repositorioAlbum, RepositorioLamina repositorioLamina) {
+	public ControladorLamina(RepositorioAlbum repositorioAlbum, RepositorioLamina repositorioLamina,
+			RepositorioUsuario repositorioUsuario) {
 		this.repositorioAlbum = repositorioAlbum;
 		this.repositorioLamina = repositorioLamina;
+		this.repositorioUsuario = repositorioUsuario;
+	}
+
+	// Con este controlador yo gestiono vía API las láminas asociadas a los álbumes del usuario.
+
+	private Usuario obtenerUsuarioActual() {
+		String nombreUsuario = SecurityContextHolder.getContext().getAuthentication().getName();
+		if (nombreUsuario == null) {
+			return null;
+		}
+		return repositorioUsuario.findByUsername(nombreUsuario).orElse(null);
 	}
 
 	@GetMapping
-	public ResponseEntity<List<Lamina>> obtenerLaminasDeAlbum(@PathVariable Long idAlbum) {
-		if (!repositorioAlbum.existsById(idAlbum)) {
-			return ResponseEntity.notFound().build();
+	public ResponseEntity<?> obtenerLaminasDeAlbum(@PathVariable Long idAlbum) {
+		Usuario usuarioActual = obtenerUsuarioActual();
+		Optional<Album> posibleAlbum = repositorioAlbum.findByIdAndPropietarioUsername(idAlbum,
+				usuarioActual.getUsername());
+		if (posibleAlbum.isEmpty()) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND)
+					.body(Map.of("mensaje", "Álbum no encontrado o no pertenece al usuario autenticado"));
 		}
 		List<Lamina> laminas = repositorioLamina.findByAlbumId(idAlbum);
 		return ResponseEntity.ok(laminas);
 	}
 
 	@PostMapping
-	public ResponseEntity<Lamina> crearLaminaEnAlbum(@PathVariable Long idAlbum, @RequestBody Lamina laminaPedido) {
-		Optional<Album> posibleAlbum = repositorioAlbum.findById(idAlbum);
+	public ResponseEntity<?> crearLaminaEnAlbum(@PathVariable Long idAlbum, @RequestBody Lamina laminaPedido) {
+		Usuario usuarioActual = obtenerUsuarioActual();
+		Optional<Album> posibleAlbum = repositorioAlbum.findByIdAndPropietarioUsername(idAlbum,
+				usuarioActual.getUsername());
 		if (posibleAlbum.isEmpty()) {
-			return ResponseEntity.notFound().build();
+			return ResponseEntity.status(HttpStatus.NOT_FOUND)
+					.body(Map.of("mensaje", "Álbum no encontrado o no pertenece al usuario autenticado"));
 		}
 
 		Album album = posibleAlbum.get();
@@ -60,10 +84,13 @@ public class ControladorLamina {
 	}
 
 	@PostMapping("/lote")
-	public ResponseEntity<List<Lamina>> crearLaminasEnLote(@PathVariable Long idAlbum, @RequestBody List<Lamina> laminasPedido) {
-		Optional<Album> posibleAlbum = repositorioAlbum.findById(idAlbum);
+	public ResponseEntity<?> crearLaminasEnLote(@PathVariable Long idAlbum, @RequestBody List<Lamina> laminasPedido) {
+		Usuario usuarioActual = obtenerUsuarioActual();
+		Optional<Album> posibleAlbum = repositorioAlbum.findByIdAndPropietarioUsername(idAlbum,
+				usuarioActual.getUsername());
 		if (posibleAlbum.isEmpty()) {
-			return ResponseEntity.notFound().build();
+			return ResponseEntity.status(HttpStatus.NOT_FOUND)
+					.body(Map.of("mensaje", "Álbum no encontrado o no pertenece al usuario autenticado"));
 		}
 
 		Album album = posibleAlbum.get();
@@ -95,10 +122,13 @@ public class ControladorLamina {
 	}
 
 	@GetMapping("/faltantes")
-	public ResponseEntity<List<Lamina>> obtenerLaminasFaltantes(@PathVariable Long idAlbum) {
-		Optional<Album> posibleAlbum = repositorioAlbum.findById(idAlbum);
+	public ResponseEntity<?> obtenerLaminasFaltantes(@PathVariable Long idAlbum) {
+		Usuario usuarioActual = obtenerUsuarioActual();
+		Optional<Album> posibleAlbum = repositorioAlbum.findByIdAndPropietarioUsername(idAlbum,
+				usuarioActual.getUsername());
 		if (posibleAlbum.isEmpty()) {
-			return ResponseEntity.notFound().build();
+			return ResponseEntity.status(HttpStatus.NOT_FOUND)
+					.body(Map.of("mensaje", "Álbum no encontrado o no pertenece al usuario autenticado"));
 		}
 
 		Album album = posibleAlbum.get();
@@ -141,9 +171,13 @@ public class ControladorLamina {
 	}
 
 	@GetMapping("/repetidas")
-	public ResponseEntity<List<Lamina>> obtenerLaminasRepetidas(@PathVariable Long idAlbum) {
-		if (!repositorioAlbum.existsById(idAlbum)) {
-			return ResponseEntity.notFound().build();
+	public ResponseEntity<?> obtenerLaminasRepetidas(@PathVariable Long idAlbum) {
+		Usuario usuarioActual = obtenerUsuarioActual();
+		Optional<Album> posibleAlbum = repositorioAlbum.findByIdAndPropietarioUsername(idAlbum,
+				usuarioActual.getUsername());
+		if (posibleAlbum.isEmpty()) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND)
+					.body(Map.of("mensaje", "Álbum no encontrado o no pertenece al usuario autenticado"));
 		}
 		List<Lamina> laminasRepetidas = repositorioLamina.findByAlbumIdAndEstado(idAlbum, EstadoLamina.REPETIDA);
 		return ResponseEntity.ok(laminasRepetidas);

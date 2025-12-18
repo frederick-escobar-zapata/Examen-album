@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Iniciar sesión</title>
+</head>
+<body>
+<h1>Iniciar sesión</h1>
+
+<form id="loginForm">
+    <div>
+        <label for="username">Usuario:</label>
+        <input type="text" id="username" name="username" required />
+    </div>
+    <div>
+        <label for="password">Contraseña:</label>
+        <input type="password" id="password" name="password" required />
+    </div>
+    <button type="submit">Entrar</button>
+</form>
+
+<p>
+    ¿No tienes cuenta?
+    <a th:href="@{'/auth/register'}">Registrarse</a>
+</p>
+
+<div id="mensaje" style="color:red;"></div>
+
+<script>
+    document.getElementById('loginForm').addEventListener('submit', async function (e) {
+        e.preventDefault();
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+
+        const mensaje = document.getElementById('mensaje');
+        mensaje.textContent = '';
+
+        try {
+            const response = await fetch('/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username, password })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                const token = data.token;
+                localStorage.setItem('jwtToken', token);
+                window.location.href = '/vista';
+            } else {
+                const errorText = await response.text();
+                mensaje.textContent = errorText || 'Error al iniciar sesión';
+            }
+        } catch (err) {
+            mensaje.textContent = 'Error de comunicación con el servidor';
+        }
+    });
+</script>
+
+</body>
+</html>

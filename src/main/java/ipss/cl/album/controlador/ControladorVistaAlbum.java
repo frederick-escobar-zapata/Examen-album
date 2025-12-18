@@ -3,12 +3,15 @@ package ipss.cl.album.controlador;
 import ipss.cl.album.modelo.Album;
 import ipss.cl.album.modelo.EstadoLamina;
 import ipss.cl.album.modelo.Lamina;
+import ipss.cl.album.modelo.Usuario;
 import ipss.cl.album.repositorio.RepositorioAlbum;
 import ipss.cl.album.repositorio.RepositorioLamina;
+import ipss.cl.album.repositorio.RepositorioUsuario;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -22,21 +25,43 @@ public class ControladorVistaAlbum {
 
 	private final RepositorioAlbum repositorioAlbum;
 	private final RepositorioLamina repositorioLamina;
+	private final RepositorioUsuario repositorioUsuario;
 
-	public ControladorVistaAlbum(RepositorioAlbum repositorioAlbum, RepositorioLamina repositorioLamina) {
+	public ControladorVistaAlbum(RepositorioAlbum repositorioAlbum,
+			RepositorioLamina repositorioLamina,
+			RepositorioUsuario repositorioUsuario) {
 		this.repositorioAlbum = repositorioAlbum;
 		this.repositorioLamina = repositorioLamina;
+		this.repositorioUsuario = repositorioUsuario;
+	}
+
+	// Con este controlador yo gestiono las vistas HTML para que cada usuario administre sus álbumes y láminas.
+
+	private Usuario obtenerUsuarioActual() {
+		String nombreUsuario = SecurityContextHolder.getContext().getAuthentication().getName();
+		if (nombreUsuario == null) {
+			return null;
+		}
+		return repositorioUsuario.findByUsername(nombreUsuario).orElse(null);
 	}
 
 	@GetMapping({"/vista", "/vista/"})
 	public String mostrarInicio(Model modelo) {
-		List<Album> albumes = repositorioAlbum.findAll();
+		Usuario usuarioActual = obtenerUsuarioActual();
+		if (usuarioActual == null) {
+			return "redirect:/auth/login";
+		}
+		List<Album> albumes = repositorioAlbum.findByPropietarioUsername(usuarioActual.getUsername());
 		modelo.addAttribute("albumes", albumes);
 		return "inicio";
 	}
 
 	@GetMapping("/vista/albumes/nuevo")
 	public String mostrarFormularioNuevoAlbum(Model modelo) {
+		Usuario usuarioActual = obtenerUsuarioActual();
+		if (usuarioActual == null) {
+			return "redirect:/auth/login";
+		}
 		Album album = new Album();
 		modelo.addAttribute("album", album);
 		return "album-formulario";
@@ -44,13 +69,22 @@ public class ControladorVistaAlbum {
 
 	@PostMapping("/vista/albumes")
 	public String crearAlbumDesdeFormulario(@ModelAttribute("album") Album album) {
+		Usuario usuarioActual = obtenerUsuarioActual();
+		if (usuarioActual == null) {
+			return "redirect:/auth/login";
+		}
+		album.asignarPropietario(usuarioActual);
 		repositorioAlbum.save(album);
 		return "redirect:/vista/";
 	}
 
 	@GetMapping("/vista/albumes/{id}/editar")
 	public String mostrarFormularioEditarAlbum(@PathVariable Long id, Model modelo) {
-		Optional<Album> posibleAlbum = repositorioAlbum.findById(id);
+		Usuario usuarioActual = obtenerUsuarioActual();
+		if (usuarioActual == null) {
+			return "redirect:/auth/login";
+		}
+		Optional<Album> posibleAlbum = repositorioAlbum.findByIdAndPropietarioUsername(id, usuarioActual.getUsername());
 		if (posibleAlbum.isEmpty()) {
 			return "redirect:/vista/";
 		}
@@ -60,7 +94,11 @@ public class ControladorVistaAlbum {
 
 	@PostMapping("/vista/albumes/{id}/editar")
 	public String actualizarAlbumDesdeFormulario(@PathVariable Long id, @ModelAttribute("album") Album albumFormulario) {
-		Optional<Album> posibleAlbum = repositorioAlbum.findById(id);
+		Usuario usuarioActual = obtenerUsuarioActual();
+		if (usuarioActual == null) {
+			return "redirect:/auth/login";
+		}
+		Optional<Album> posibleAlbum = repositorioAlbum.findByIdAndPropietarioUsername(id, usuarioActual.getUsername());
 		if (posibleAlbum.isEmpty()) {
 			return "redirect:/vista/";
 		}
@@ -76,15 +114,22 @@ public class ControladorVistaAlbum {
 
 	@PostMapping("/vista/albumes/{id}/eliminar")
 	public String eliminarAlbumDesdeFormulario(@PathVariable Long id) {
-		if (repositorioAlbum.existsById(id)) {
-			repositorioAlbum.deleteById(id);
+		Usuario usuarioActual = obtenerUsuarioActual();
+		if (usuarioActual == null) {
+			return "redirect:/auth/login";
 		}
+		Optional<Album> posibleAlbum = repositorioAlbum.findByIdAndPropietarioUsername(id, usuarioActual.getUsername());
+		posibleAlbum.ifPresent(repositorioAlbum::delete);
 		return "redirect:/vista/";
 	}
 
 	@GetMapping("/vista/albumes/{id}")
 	public String mostrarDetalleAlbum(@PathVariable Long id, Model modelo) {
-		Optional<Album> posibleAlbum = repositorioAlbum.findById(id);
+		Usuario usuarioActual = obtenerUsuarioActual();
+		if (usuarioActual == null) {
+			return "redirect:/auth/login";
+		}
+		Optional<Album> posibleAlbum = repositorioAlbum.findByIdAndPropietarioUsername(id, usuarioActual.getUsername());
 		if (posibleAlbum.isEmpty()) {
 			return "redirect:/vista/";
 		}
@@ -98,7 +143,11 @@ public class ControladorVistaAlbum {
 	public String mostrarLaminasFaltantes(@PathVariable Long id,
 			@RequestParam(name = "pagina", defaultValue = "0") int pagina,
 			Model modelo) {
-		Optional<Album> posibleAlbum = repositorioAlbum.findById(id);
+		Usuario usuarioActual = obtenerUsuarioActual();
+		if (usuarioActual == null) {
+			return "redirect:/auth/login";
+		}
+		Optional<Album> posibleAlbum = repositorioAlbum.findByIdAndPropietarioUsername(id, usuarioActual.getUsername());
 		if (posibleAlbum.isEmpty()) {
 			return "redirect:/vista/";
 		}
@@ -163,7 +212,11 @@ public class ControladorVistaAlbum {
 	public String mostrarLaminasDeAlbum(@PathVariable Long id,
 			@RequestParam(name = "pagina", defaultValue = "0") int pagina,
 			Model modelo) {
-		Optional<Album> posibleAlbum = repositorioAlbum.findById(id);
+		Usuario usuarioActual = obtenerUsuarioActual();
+		if (usuarioActual == null) {
+			return "redirect:/auth/login";
+		}
+		Optional<Album> posibleAlbum = repositorioAlbum.findByIdAndPropietarioUsername(id, usuarioActual.getUsername());
 		if (posibleAlbum.isEmpty()) {
 			return "redirect:/vista/";
 		}
@@ -182,7 +235,11 @@ public class ControladorVistaAlbum {
 	public String mostrarLaminasRepetidas(@PathVariable Long id,
 			@RequestParam(name = "pagina", defaultValue = "0") int pagina,
 			Model modelo) {
-		Optional<Album> posibleAlbum = repositorioAlbum.findById(id);
+		Usuario usuarioActual = obtenerUsuarioActual();
+		if (usuarioActual == null) {
+			return "redirect:/auth/login";
+		}
+		Optional<Album> posibleAlbum = repositorioAlbum.findByIdAndPropietarioUsername(id, usuarioActual.getUsername());
 		if (posibleAlbum.isEmpty()) {
 			return "redirect:/vista/";
 		}
@@ -199,7 +256,11 @@ public class ControladorVistaAlbum {
 
 	@GetMapping("/vista/albumes/{id}/laminas/nueva")
 	public String mostrarFormularioNuevaLamina(@PathVariable Long id, Model modelo) {
-		Optional<Album> posibleAlbum = repositorioAlbum.findById(id);
+		Usuario usuarioActual = obtenerUsuarioActual();
+		if (usuarioActual == null) {
+			return "redirect:/auth/login";
+		}
+		Optional<Album> posibleAlbum = repositorioAlbum.findByIdAndPropietarioUsername(id, usuarioActual.getUsername());
 		if (posibleAlbum.isEmpty()) {
 			return "redirect:/vista/";
 		}
@@ -216,7 +277,11 @@ public class ControladorVistaAlbum {
 
 	@PostMapping("/vista/albumes/{id}/laminas")
 	public String crearLaminaDesdeFormulario(@PathVariable Long id, @ModelAttribute("lamina") Lamina lamina, Model modelo) {
-		Optional<Album> posibleAlbum = repositorioAlbum.findById(id);
+		Usuario usuarioActual = obtenerUsuarioActual();
+		if (usuarioActual == null) {
+			return "redirect:/auth/login";
+		}
+		Optional<Album> posibleAlbum = repositorioAlbum.findByIdAndPropietarioUsername(id, usuarioActual.getUsername());
 		if (posibleAlbum.isEmpty()) {
 			return "redirect:/vista/";
 		}
@@ -260,7 +325,11 @@ public class ControladorVistaAlbum {
 
 	@GetMapping("/vista/albumes/{idAlbum}/laminas/{idLamina}/editar")
 	public String mostrarFormularioEditarLamina(@PathVariable Long idAlbum, @PathVariable Long idLamina, Model modelo) {
-		Optional<Album> posibleAlbum = repositorioAlbum.findById(idAlbum);
+		Usuario usuarioActual = obtenerUsuarioActual();
+		if (usuarioActual == null) {
+			return "redirect:/auth/login";
+		}
+		Optional<Album> posibleAlbum = repositorioAlbum.findByIdAndPropietarioUsername(idAlbum, usuarioActual.getUsername());
 		Optional<Lamina> posibleLamina = repositorioLamina.findById(idLamina);
 		if (posibleAlbum.isEmpty() || posibleLamina.isEmpty()) {
 			return "redirect:/vista/";
@@ -274,6 +343,14 @@ public class ControladorVistaAlbum {
 	@PostMapping("/vista/albumes/{idAlbum}/laminas/{idLamina}/editar")
 	public String actualizarLaminaDesdeFormulario(@PathVariable Long idAlbum, @PathVariable Long idLamina,
 			@ModelAttribute("lamina") Lamina laminaFormulario) {
+		Usuario usuarioActual = obtenerUsuarioActual();
+		if (usuarioActual == null) {
+			return "redirect:/auth/login";
+		}
+		Optional<Album> posibleAlbum = repositorioAlbum.findByIdAndPropietarioUsername(idAlbum, usuarioActual.getUsername());
+		if (posibleAlbum.isEmpty()) {
+			return "redirect:/vista/";
+		}
 		Optional<Lamina> posibleLamina = repositorioLamina.findById(idLamina);
 		if (posibleLamina.isEmpty()) {
 			return "redirect:/vista/albumes/" + idAlbum + "/laminas";
@@ -295,7 +372,12 @@ public class ControladorVistaAlbum {
 
 	@PostMapping("/vista/albumes/{idAlbum}/laminas/{idLamina}/eliminar")
 	public String eliminarLaminaDesdeFormulario(@PathVariable Long idAlbum, @PathVariable Long idLamina) {
-		if (repositorioLamina.existsById(idLamina)) {
+		Usuario usuarioActual = obtenerUsuarioActual();
+		if (usuarioActual == null) {
+			return "redirect:/auth/login";
+		}
+		Optional<Album> posibleAlbum = repositorioAlbum.findByIdAndPropietarioUsername(idAlbum, usuarioActual.getUsername());
+		if (posibleAlbum.isPresent() && repositorioLamina.existsById(idLamina)) {
 			repositorioLamina.deleteById(idLamina);
 		}
 		return "redirect:/vista/albumes/" + idAlbum + "/laminas";
@@ -303,7 +385,11 @@ public class ControladorVistaAlbum {
 
 	@GetMapping("/vista/albumes/{id}/laminas/lote")
 	public String mostrarFormularioLote(@PathVariable Long id, Model modelo) {
-		Optional<Album> posibleAlbum = repositorioAlbum.findById(id);
+		Usuario usuarioActual = obtenerUsuarioActual();
+		if (usuarioActual == null) {
+			return "redirect:/auth/login";
+		}
+		Optional<Album> posibleAlbum = repositorioAlbum.findByIdAndPropietarioUsername(id, usuarioActual.getUsername());
 		if (posibleAlbum.isEmpty()) {
 			return "redirect:/vista/";
 		}
@@ -317,7 +403,11 @@ public class ControladorVistaAlbum {
 	public String procesarFormularioLote(@PathVariable Long id,
 			@RequestParam("numerosLaminas") String numerosLaminas,
 			@RequestParam("tipoLamina") String tipoLamina) {
-		Optional<Album> posibleAlbum = repositorioAlbum.findById(id);
+		Usuario usuarioActual = obtenerUsuarioActual();
+		if (usuarioActual == null) {
+			return "redirect:/auth/login";
+		}
+		Optional<Album> posibleAlbum = repositorioAlbum.findByIdAndPropietarioUsername(id, usuarioActual.getUsername());
 		if (posibleAlbum.isEmpty()) {
 			return "redirect:/vista/";
 		}
@@ -326,7 +416,6 @@ public class ControladorVistaAlbum {
 
 		String[] partes = numerosLaminas.split("[;,\\s]+");
 		List<Lamina> laminasAGuardar = new ArrayList<>();
-		// Para manejar números repetidos dentro del mismo lote sin crear filas duplicadas
 		java.util.Map<Integer, Lamina> nuevasPorNumero = new java.util.HashMap<>();
 		for (String parte : partes) {
 			if (parte.isBlank()) {
@@ -335,10 +424,8 @@ public class ControladorVistaAlbum {
 			try {
 				Integer numero = Integer.parseInt(parte.trim());
 				if (totalLaminas != null && totalLaminas > 0 && numero != null && numero > totalLaminas) {
-					// Si el número supera la cantidad total de láminas del álbum, lo ignoramos
 					continue;
 				}
-				// Primero revisamos si ya creamos una nueva lámina con este número en este mismo lote
 				Lamina laminaNuevaEnLote = nuevasPorNumero.get(numero);
 				if (laminaNuevaEnLote != null) {
 					Integer cantidadActual = laminaNuevaEnLote.obtenerCantidadRepetidas();
@@ -349,7 +436,6 @@ public class ControladorVistaAlbum {
 					laminaNuevaEnLote.asignarEstado(EstadoLamina.REPETIDA);
 					continue;
 				}
-				// Si no hay nueva en el lote, buscamos en la base de datos
 				List<Lamina> laminasExistentes = repositorioLamina.findByAlbumIdAndNumero(id, numero);
 				if (!laminasExistentes.isEmpty()) {
 					Lamina laminaPrincipal = laminasExistentes.get(0);
@@ -371,7 +457,7 @@ public class ControladorVistaAlbum {
 					nuevasPorNumero.put(numero, lamina);
 				}
 			} catch (NumberFormatException e) {
-				// En esta parte yo decido ignorar valores no numéricos
+				// En esta parte yo decido ignorar valores no numéricos.
 			}
 		}
 

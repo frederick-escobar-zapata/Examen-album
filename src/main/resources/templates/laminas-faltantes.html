@@ -5,6 +5,9 @@
 	<title th:text="'Laminas faltantes de ' + ${album.nombre}">Laminas faltantes</title>
 </head>
 <body>
+	<p style="text-align: right;">
+		<a href="/auth/logout" onclick="localStorage.removeItem('jwtToken');">Cerrar sesión</a>
+	</p>
 	<h1 th:text="'Laminas faltantes de ' + ${album.nombre}">Laminas faltantes</h1>
 
 	<p>

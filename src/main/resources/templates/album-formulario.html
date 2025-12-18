@@ -5,6 +5,9 @@
 	<title th:text="${album.id} == null ? 'Crear álbum' : 'Editar álbum'">Formulario de álbum</title>
 </head>
 <body>
+	<p style="text-align: right;">
+		<a href="/auth/logout" onclick="localStorage.removeItem('jwtToken');">Cerrar sesión</a>
+	</p>
 	<h1 th:text="${album.id} == null ? 'Crear nuevo álbum' : 'Editar álbum'"></h1>
 
 	<form th:action="${album.id} == null ? '/vista/albumes' : '/vista/albumes/' + ${album.id} + '/editar'" th:object="${album}" method="post">

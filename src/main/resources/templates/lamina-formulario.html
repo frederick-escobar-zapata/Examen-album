@@ -5,6 +5,9 @@
 	<title th:text="${modoEdicion} ? 'Editar lámina' : 'Nueva lámina'">Lámina</title>
 </head>
 <body>
+	<p style="text-align: right;">
+		<a href="/auth/logout" onclick="localStorage.removeItem('jwtToken');">Cerrar sesión</a>
+	</p>
 	<h1 th:text="${modoEdicion} ? 'Editar lámina' : 'Nueva lámina'">Lámina</h1>
 
 	<p th:if="${mensajeError}" th:text="${mensajeError}" style="color: red;"></p>

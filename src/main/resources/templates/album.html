@@ -5,6 +5,9 @@
 	<title th:text="${album.nombre}">Detalle de álbum</title>
 </head>
 <body>
+	<p style="text-align: right;">
+		<a href="/auth/logout" onclick="localStorage.removeItem('jwtToken');">Cerrar sesión</a>
+	</p>
 	<h1 th:text="${album.nombre}">Nombre del álbum</h1>
 	<p>
 		<strong>Año:</strong> <span th:text="${album.anio}"></span><br />

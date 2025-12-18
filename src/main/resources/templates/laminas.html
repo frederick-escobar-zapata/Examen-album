@@ -5,6 +5,9 @@
 	<title th:text="'Láminas de ' + ${album.nombre}">Láminas</title>
 </head>
 <body>
+	<p style="text-align: right;">
+		<a href="/auth/logout" onclick="localStorage.removeItem('jwtToken');">Cerrar sesión</a>
+	</p>
 	<h1 th:text="'Láminas de ' + ${album.nombre}">Láminas</h1>
 
 	<p>

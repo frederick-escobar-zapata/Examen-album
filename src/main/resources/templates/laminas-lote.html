@@ -5,6 +5,9 @@
 	<title th:text="'Carga por lote - ' + ${album.nombre}">Carga por lote</title>
 </head>
 <body>
+	<p style="text-align: right;">
+		<a href="/auth/login" onclick="localStorage.removeItem('jwtToken');">Cerrar sesión</a>
+	</p>
 	<h1 th:text="'Carga por lote para ' + ${album.nombre}">Carga por lote</h1>
 
 	<p>En esta vista yo ingreso los números de las láminas separados por coma, punto y coma o espacios.</p>
@@ -28,4 +31,9 @@
 		<a th:href="@{'/vista/albumes/' + ${album.id} + '/laminas'}">Volver al listado de láminas</a>
 	</p>
 </body>
-</html>
+	<p style="text-align: right;">
+		<a href="/auth/logout" onclick="localStorage.removeItem('jwtToken');">Cerrar sesión</a>
+	</p>
+	<h1 th:text="'Carga por lote para ' + ${album.nombre}">Carga por lote</h1>
+
+	<p>En esta vista yo ingreso los números de las láminas separados por coma, punto y coma o espacios.</p>

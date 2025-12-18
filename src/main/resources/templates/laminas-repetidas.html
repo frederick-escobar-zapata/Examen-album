@@ -5,6 +5,9 @@
 	<title th:text="'laminas repetidas de ' + ${album.nombre}">laminas repetidas</title>
 </head>
 <body>
+	<p style="text-align: right;">
+		<a href="/auth/login" onclick="localStorage.removeItem('jwtToken');">Cerrar sesión</a>
+	</p>
 	<h1 th:text="'laminas repetidas de ' + ${album.nombre}">laminas repetidas</h1>
 
 	<p>
@@ -31,7 +34,11 @@
 		</tbody>
 	</table>
 
-	<div th:if="${totalPaginas != null}">
+			<p style="text-align: right;">
+				<a href="/auth/logout" onclick="localStorage.removeItem('jwtToken');">Cerrar sesión</a>
+			</p>
+
+			<p>
 		<p>
 			<span th:text="'Página ' + (${paginaActual} + 1) + ' de ' + (${totalPaginas == 0} ? 1 : ${totalPaginas})"></span>
 		</p>
