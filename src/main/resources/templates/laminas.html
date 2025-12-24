@@ -3,63 +3,87 @@
 <head>
 	<meta charset="UTF-8" />
 	<title th:text="'Láminas de ' + ${album.nombre}">Láminas</title>
+	<link rel="stylesheet" href="/css/login.css?v=2" />
 </head>
 <body>
-	<p style="text-align: right;">
-		<a href="/auth/logout" onclick="localStorage.removeItem('jwtToken');">Cerrar sesión</a>
-	</p>
-	<h1 th:text="'Láminas de ' + ${album.nombre}">Láminas</h1>
+<div class="page-bg">
+	<main class="login-wrapper">
+		<header class="login-header">
+			<div class="logo">Co-Lections</div>
+			<h1 th:text="'Láminas de ' + ${album.nombre}">Láminas</h1>
+		</header>
 
-	<p>
-		<a th:href="@{'/vista/albumes/' + ${album.id}}">Volver al álbum</a> |
-		<a th:href="@{'/vista/albumes/' + ${album.id} + '/laminas/nueva'}">Agregar lámina individual</a> |
-		<a th:href="@{'/vista/albumes/' + ${album.id} + '/laminas/lote'}">Agregar láminas por lote</a>
-	</p>
+		<section class="card album-list">
 
-	<table border="1" cellpadding="4" cellspacing="0">
-		<thead>
-			<tr>
-				<th>Número</th>
-				<th>Tipo</th>
-				<th>Estado</th>
-				<th>Repetidas</th>
-				<th>Eliminar</th>
-			</tr>
-		</thead>
-		<tbody>
-			<tr th:each="lamina : ${laminas}">
-				<td th:text="${lamina.numero}"></td>
-				<td th:text="${lamina.tipo}"></td>
-				<td th:text="${lamina.estado}"></td>
-				<td th:text="${lamina.cantidadRepetidas}"></td>
-				<td>
-					
-					
-					<form th:action="@{'/vista/albumes/' + ${album.id} + '/laminas/' + ${lamina.id} + '/eliminar'}" method="post" style="display:inline">
-						<button type="submit">Eliminar</button>
-					</form>
-				</td>
-			</tr>
-		</tbody>
-	</table>
 
-	<div th:if="${totalPaginas != null}">
-		<p>
-			<span th:text="'Página ' + (${paginaActual} + 1) + ' de ' + (${totalPaginas == 0} ? 1 : ${totalPaginas})"></span>
-		</p>
-		<p>
-			<span th:if="${paginaActual > 0}">
-				<a th:href="@{/vista/albumes/{id}/laminas(id=${album.id},pagina=${paginaActual - 1})}">Anterior</a>
-			</span>
-			<span th:unless="${paginaActual > 0}">Anterior</span>
+			<div class="bottom-actions">
+				<p>
+					<a th:href="@{'/vista/albumes/' + ${album.id}}" class="btn-link">
+						<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+						<span>Volver al álbum</span>
+					</a>
+				</p>
+				<a class="btn-danger" href="/auth/logout" onclick="localStorage.removeItem('jwtToken');">
+					<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M16 13V11H8V8L3 12L8 16V13H16Z"/></svg>
+					<span class="action-label">Cerrar sesión</span>
+				</a>
+			</div>
 
-			|
+			<!-- If album declares a total, render sequence 1..N with either the added lamina or a placeholder -->
+			<div th:if="${album.cantidadTotalLaminas != null and album.cantidadTotalLaminas > 0}">
+				<div class="lamina-grid">
+					<div class="lamina-card" th:each="i : ${#numbers.sequence(1, album.cantidadTotalLaminas)}">
+						<div th:if="${laminaMapa[i] != null}">
+							<div class="thumb">
+								<img th:src="${laminaMapa[i].urlFoto != null ? laminaMapa[i].urlFoto : '/images/placeholder.svg'}" alt="foto lámina" />
+							</div>
+							<div class="lamina-meta">
+								<span class="numero" th:text="${i}"></span>
+								<span class="tipo" th:text="${laminaMapa[i].tipo != null ? laminaMapa[i].tipo : 'Lámina'}"></span>
+							</div>
+						</div>
+						<div th:if="${laminaMapa[i] == null}">
+							<div class="thumb no-photo">
+								<span class="no-photo-text">aún no añadida</span>
+							</div>
+							<div class="lamina-meta">
+								<span class="numero" th:text="${i}"></span>
+								<span class="tipo">-</span>
+							</div>
+						</div>
+					</div>
+					<div class="lamina-card add-card">
+						<a th:href="@{'/vista/albumes/' + ${album.id} + '/laminas/nueva'}" class="btn-primary">Agregar nueva</a>
+					</div>
+				</div>
+			</div>
+			<!-- If album has no declared total, render only the actual laminas (existing) -->
+			<div th:if="${album.cantidadTotalLaminas == null or album.cantidadTotalLaminas <= 0}">
+				<div th:if="${laminas == null or #lists.isEmpty(laminas)}" style="text-align:center; padding:2rem 0;">
+					<a th:href="@{'/vista/albumes/' + ${album.id} + '/laminas/nueva'}" class="btn-primary">Agregar nueva</a>
+				</div>
+				<div th:if="${!(laminas == null or #lists.isEmpty(laminas))}" class="lamina-grid">
+					<div class="lamina-card" th:each="lamina : ${laminas}">
+						<div class="thumb">
+							<img th:src="${lamina.urlFoto != null ? lamina.urlFoto : '/images/placeholder.svg'}" alt="foto lámina" />
+						</div>
+						<div class="lamina-meta">
+							<span class="numero" th:text="${lamina.numero}"></span>
+							<span class="tipo" th:text="${lamina.tipo != null ? lamina.tipo : 'Lámina'}"></span>
+						</div>
+					</div>
+					<div class="lamina-card add-card">
+						<a th:href="@{'/vista/albumes/' + ${album.id} + '/laminas/nueva'}" class="btn-primary">Agregar nueva</a>
+					</div>
+				</div>
+			</div>
+		</section>
 
-			<span th:if="${paginaActual + 1 < totalPaginas}">
-				<a th:href="@{/vista/albumes/{id}/laminas(id=${album.id},pagina=${paginaActual + 1})}">Siguiente</a>
-			</span>
-			<span th:unless="${paginaActual + 1 < totalPaginas}">Siguiente</span>
-		</p>
-	</div>
+		<footer class="footer">
+			<div class="stamp-left"></div>
+			<div class="stamp-right"></div>
+		</footer>
+	</main>
+</div>
 </body>
 </html>

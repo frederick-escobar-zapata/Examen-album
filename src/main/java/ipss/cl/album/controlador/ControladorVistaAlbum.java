@@ -56,6 +56,11 @@ public class ControladorVistaAlbum {
 		return "inicio";
 	}
 
+	@GetMapping("/")
+	public String raiz() {
+		return "redirect:/vista/";
+	}
+
 	@GetMapping("/vista/albumes/nuevo")
 	public String mostrarFormularioNuevoAlbum(Model modelo) {
 		Usuario usuarioActual = obtenerUsuarioActual();
@@ -224,8 +229,17 @@ public class ControladorVistaAlbum {
 		int tamanoPagina = 10;
 		Pageable pageable = PageRequest.of(pagina, tamanoPagina, Sort.by("numero").ascending());
 		Page<Lamina> paginaLaminas = repositorioLamina.findByAlbumId(id, pageable);
+		// Prepare a map of number -> Lamina to make template lookup simple and safe
+		java.util.List<Lamina> laminasList = paginaLaminas.getContent();
+		java.util.Map<Integer, Lamina> laminaMapa = new java.util.HashMap<>();
+		for (Lamina l : laminasList) {
+			if (l.obtenerNumero() != null) {
+				laminaMapa.put(l.obtenerNumero(), l);
+			}
+		}
 		modelo.addAttribute("album", album);
-		modelo.addAttribute("laminas", paginaLaminas.getContent());
+		modelo.addAttribute("laminas", laminasList);
+		modelo.addAttribute("laminaMapa", laminaMapa);
 		modelo.addAttribute("paginaActual", pagina);
 		modelo.addAttribute("totalPaginas", paginaLaminas.getTotalPages());
 		return "laminas";

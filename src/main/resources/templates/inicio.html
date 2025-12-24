@@ -3,30 +3,57 @@
 <head>
 	<meta charset="UTF-8" />
 	<title>Álbumes disponibles</title>
+	<link rel="stylesheet" href="/css/login.css?v=2" />
 </head>
 <body>
-	<p style="text-align: right;">
-		<a href="/auth/logout" onclick="localStorage.removeItem('jwtToken');">Cerrar sesión</a>
-	</p>
-	<h1>Álbumes disponibles</h1>
+<div class="page-bg">
+	<main class="login-wrapper">
+		<header class="login-header">
+			<div class="logo">Co-Lections</div>
+			<h1>Álbumes disponibles</h1>
+		</header>
 
-	<p>
-		<a th:href="@{'/vista/albumes/nuevo'}">Crear nuevo álbum</a>
-	</p>
+		<section class="card album-list">
+			<div class="top-actions">
+				<a class="btn-primary" th:href="@{'/vista/albumes/nuevo'}">
+					<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M19 13H13V19H11V13H5V11H11V5H13V11H19V13Z"/></svg>
+					<span class="action-label">Crear nuevo álbum</span>
+				</a>
+				<a class="btn-danger" href="/auth/logout" onclick="localStorage.removeItem('jwtToken');">
+					<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M16 13V11H8V8L3 12L8 16V13H16Z"/></svg>
+					<span class="action-label">Cerrar sesión</span>
+				</a>
+			</div>
 
-	<p th:if="${albumes.isEmpty()}">Aún no he creado ningún álbum.</p>
+			<p th:if="${albumes.isEmpty()}">Aún no he creado ningún álbum.</p>
 
-	<ul th:if="${!albumes.isEmpty()}">
-		<li th:each="album : ${albumes}">
-			<a th:href="@{'/vista/albumes/' + ${album.id}}" th:text="${album.nombre}"></a>
-			<span th:text="' (' + ${album.anio} + ')'">(año)</span>
-			|
-			<a th:href="@{'/vista/albumes/' + ${album.id} + '/editar'}">Editar</a>
-			|
-			<form th:action="@{'/vista/albumes/' + ${album.id} + '/eliminar'}" method="post" style="display:inline">
-				<button type="submit" onclick="return confirm('¿Seguro que deseas eliminar este álbum y sus láminas?');">Eliminar</button>
-			</form>
-		</li>
-	</ul>
+			<div th:if="${!albumes.isEmpty()}" class="album-grid">
+				<div class="album-card" th:each="album : ${albumes}">
+					<div>
+						<a th:href="@{'/vista/albumes/' + ${album.id}}" class="album-title" th:text="${album.nombre}">Nombre</a>
+						<div class="album-meta" th:text="'Año: ' + ${album.anio}">Año</div>
+					</div>
+					<div class="album-actions">
+						<a th:href="@{'/vista/albumes/' + ${album.id} + '/editar'}" class="edit">
+							<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+							<span class="action-label">Editar</span>
+						</a>
+						<form th:action="@{'/vista/albumes/' + ${album.id} + '/eliminar'}" method="post" style="display:inline">
+							<button type="submit" class="delete btn-small" onclick="return confirm('¿Seguro que deseas eliminar este álbum y sus láminas?');">
+								<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 7h12v13a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V7zm3-4h6l1 1H8l1-1z"/></svg>
+								<span class="action-label">Eliminar</span>
+							</button>
+						</form>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<footer class="footer">
+			<div class="stamp-left"></div>
+			<div class="stamp-right"></div>
+		</footer>
+	</main>
+</div>
 </body>
 </html>

@@ -3,43 +3,70 @@
 <head>
 	<meta charset="UTF-8" />
 	<title th:text="${album.nombre}">Detalle de álbum</title>
+	<link rel="stylesheet" href="/css/login.css?v=2" />
 </head>
 <body>
-	<p style="text-align: right;">
-		<a href="/auth/logout" onclick="localStorage.removeItem('jwtToken');">Cerrar sesión</a>
-	</p>
-	<h1 th:text="${album.nombre}">Nombre del álbum</h1>
-	<p>
-		<strong>Año:</strong> <span th:text="${album.anio}"></span><br />
-		<strong>Fecha de lanzamiento:</strong> <span th:text="${album.fechaLanzamiento}"></span><br />
-		<strong>Descripción:</strong> <span th:text="${album.descripcion}"></span><br />
-		<strong>Cantidad total de láminas:</strong> <span th:text="${album.cantidadTotalLaminas}"></span>
-	</p>
+<div class="page-bg">
+	<main class="login-wrapper">
+		<header class="login-header">
+			<div class="logo">Co-Lections</div>
+			<h1 th:text="${album.nombre}">Nombre del álbum</h1>
+		</header>
 
-	<h2>Opciones para este álbum</h2>
-	<ul>
-		<li>
-			<a th:href="@{'/vista/albumes/' + ${album.id} + '/laminas'}">Gestionar láminas</a>
-		</li>
-		<li>
-			<a th:href="@{'/vista/albumes/' + ${album.id} + '/laminas/faltantes'}">Ver láminas faltantes</a>
-		</li>
-		<li>
-			<a th:href="@{'/vista/albumes/' + ${album.id} + '/laminas/repetidas'}">Ver láminas repetidas</a>
-		</li>
-		<li>
-			<a th:href="@{'/vista/albumes/' + ${album.id} + '/laminas/nueva'}">Agregar lámina individual</a>
-		</li>
-		<li>
-			<a th:href="@{'/vista/albumes/' + ${album.id} + '/laminas/lote'}">Agregar láminas por lote</a>
-		</li>
-		<li>
-			<a th:href="@{'/vista/albumes/' + ${album.id} + '/laminas'}">Eliminar láminas</a>
-		</li>
-	</ul>
+		<section class="card">
 
-	<p>
-		<a href="/vista/">Volver al listado de álbumes</a>
-	</p>
+			<p>
+				<strong>Año:</strong> <span th:text="${album.anio}"></span><br />
+				<strong>Fecha de lanzamiento:</strong>
+				<span th:text="${album.fechaLanzamiento == null ? 'sin fecha' : #temporals.format(album.fechaLanzamiento, 'dd/MM/yyyy')}" ></span><br />
+				<strong>Descripción:</strong> <span th:text="${album.descripcion}"></span><br />
+				<strong>Cantidad total de láminas:</strong> <span th:text="${album.cantidadTotalLaminas}"></span>
+			</p>
+
+			<h2>Opciones para este álbum</h2>
+			<div class="options-grid">
+				<a th:href="@{'/vista/albumes/' + ${album.id} + '/laminas'}" class="option-card" title="Gestionar láminas">
+					<svg class="icon-large" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 7h18M3 12h18M3 17h18" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+					<div class="label">Gestionar láminas</div>
+				</a>
+				<a th:href="@{'/vista/albumes/' + ${album.id} + '/laminas/faltantes'}" class="option-card" title="Láminas faltantes">
+					<svg class="icon-large" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 9v4m0 4h.01" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+					<div class="label">Ver láminas faltantes</div>
+				</a>
+				<a th:href="@{'/vista/albumes/' + ${album.id} + '/laminas/repetidas'}" class="option-card" title="Láminas repetidas">
+					<svg class="icon-large" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 7v6h6" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 17v-6h-6" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+					<div class="label">Ver láminas repetidas</div>
+				</a>
+				<a th:href="@{'/vista/albumes/' + ${album.id} + '/laminas/nueva'}" class="option-card" title="Agregar lámina">
+					<svg class="icon-large" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+					<div class="label">Agregar lámina</div>
+				</a>
+				<a th:href="@{'/vista/albumes/' + ${album.id} + '/laminas/lote'}" class="option-card" title="Agregar láminas por lote">
+					<svg class="icon-large" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3v6M5 21h14" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+					<div class="label">Agregar por lote</div>
+				</a>
+
+			</div>
+
+			<div class="bottom-actions">
+				<p style="margin:0;">
+					<a href="/vista/" class="btn-link">
+						<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+						<span class="action-label">Volver al listado de álbumes</span>
+					</a>
+				</p>
+
+				<a class="btn-danger" href="/auth/logout" onclick="localStorage.removeItem('jwtToken');">
+					Cerrar sesión
+				</a>
+			</div>
+		</section>
+
+		<footer class="footer">
+			<div class="stamp-left"></div>
+			<div class="stamp-right"></div>
+		</footer>
+	</main>
+</div>
 </body>
 </html>

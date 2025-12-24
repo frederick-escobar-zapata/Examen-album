@@ -3,38 +3,49 @@
 <head>
 	<meta charset="UTF-8" />
 	<title th:text="${album.id} == null ? 'Crear álbum' : 'Editar álbum'">Formulario de álbum</title>
+	<link rel="stylesheet" href="/css/login.css?v=2" />
 </head>
 <body>
-	<p style="text-align: right;">
-		<a href="/auth/logout" onclick="localStorage.removeItem('jwtToken');">Cerrar sesión</a>
-	</p>
-	<h1 th:text="${album.id} == null ? 'Crear nuevo álbum' : 'Editar álbum'"></h1>
+<div class="page-bg">
+	<main class="login-wrapper">
+		<header class="login-header">
+			<div class="logo">Co-Lections</div>
+			<h1 th:text="${album.id} == null ? 'Crear nuevo álbum' : 'Editar álbum'"></h1>
+		</header>
 
-	<form th:action="${album.id} == null ? '/vista/albumes' : '/vista/albumes/' + ${album.id} + '/editar'" th:object="${album}" method="post">
-		<p>
-			<label for="nombre">Nombre:</label>
-			<input type="text" id="nombre" th:field="*{nombre}" required />
-		</p>
-		<p>
-			<label for="anio">Año:</label>
-			<input type="number" id="anio" th:field="*{anio}" min="0" />
-		</p>
-		<p>
-			<label for="fechaLanzamiento">Fecha de lanzamiento:</label>
-			<input type="date" id="fechaLanzamiento" th:field="*{fechaLanzamiento}" />
-		</p>
-		<p>
-			<label for="descripcion">Descripción:</label><br />
-			<textarea id="descripcion" th:field="*{descripcion}" rows="3" cols="40"></textarea>
-		</p>
-		<p>
-			<label for="cantidadTotalLaminas">Cantidad total de láminas:</label>
-			<input type="number" id="cantidadTotalLaminas" th:field="*{cantidadTotalLaminas}" min="0" />
-		</p>
-		<p>
-			<button type="submit">Guardar</button>
-			<a href="/vista/">Cancelar</a>
-		</p>
-	</form>
+		<section class="card">
+			<p class="top-actions" style="text-align: right;">
+				<a class="btn-danger" href="/auth/logout" onclick="localStorage.removeItem('jwtToken');">Cerrar sesión</a>
+			</p>
+
+			<form th:action="${album.id} == null ? '/vista/albumes' : '/vista/albumes/' + ${album.id} + '/editar'" th:object="${album}" method="post" class="login-form">
+				<label for="nombre">Nombre</label>
+				<input type="text" id="nombre" th:field="*{nombre}" required />
+
+				<label for="anio">Año</label>
+				<input type="number" id="anio" th:field="*{anio}" min="0" />
+
+				<label for="fechaLanzamiento">Fecha de lanzamiento</label>
+				<input type="date" id="fechaLanzamiento" th:field="*{fechaLanzamiento}" />
+
+				<label for="descripcion">Descripción</label>
+				<textarea id="descripcion" th:field="*{descripcion}" rows="3"></textarea>
+
+				<label for="cantidadTotalLaminas">Cantidad total de láminas</label>
+				<input type="number" id="cantidadTotalLaminas" th:field="*{cantidadTotalLaminas}" min="0" />
+
+				<div class="form-actions">
+					<button class="btn-primary" type="submit">Guardar</button>
+					<a class="btn-link" href="/vista/">Cancelar</a>
+				</div>
+			</form>
+		</section>
+
+		<footer class="footer">
+			<div class="stamp-left"></div>
+			<div class="stamp-right"></div>
+		</footer>
+	</main>
+</div>
 </body>
 </html>

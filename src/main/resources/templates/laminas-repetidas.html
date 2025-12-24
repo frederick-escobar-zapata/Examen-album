@@ -2,59 +2,71 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
 	<meta charset="UTF-8" />
-	<title th:text="'laminas repetidas de ' + ${album.nombre}">laminas repetidas</title>
+	<title th:text="'Láminas repetidas de ' + ${album.nombre}">Láminas repetidas</title>
+	<link rel="stylesheet" href="/css/login.css?v=2" />
 </head>
 <body>
-	<p style="text-align: right;">
-		<a href="/auth/login" onclick="localStorage.removeItem('jwtToken');">Cerrar sesión</a>
-	</p>
-	<h1 th:text="'laminas repetidas de ' + ${album.nombre}">laminas repetidas</h1>
+<div class="page-bg">
+	<main class="login-wrapper">
+		<header class="login-header">
+			<div class="logo">Co-Lections</div>
+			<h1 th:text="'Láminas repetidas de ' + ${album.nombre}">Láminas repetidas</h1>
+		</header>
 
-	<p>
-		<a th:href="@{'/vista/albumes/' + ${album.id}}">Volver al laminas</a> |
-		<a th:href="@{'/vista/albumes/' + ${album.id} + '/laminas'}">Ver todas las laminas</a>
-	</p>
+		<section class="card">
 
-	<table border="1" cellpadding="4" cellspacing="0">
-		<thead>
-			<tr>
-				<th>Numero</th>
-				<th>Tipo</th>
-				<th>Repetidas</th>
-				
-			</tr>
-		</thead>
-		<tbody>
-			<tr th:each="lamina : ${laminasRepetidas}">
-				<td th:text="${lamina.numero}"></td>
-				<td th:text="${lamina.tipo}"></td>
-				<td th:text="${lamina.cantidadRepetidas}"></td>
-				
-			</tr>
-		</tbody>
-	</table>
+			<div class="bottom-actions">
+				<p>
+					<a th:href="@{'/vista/albumes/' + ${album.id}}" class="btn-link">
+						<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+						<span>Volver al álbum</span>
+					</a>
+				</p>
+				<a class="btn-danger" href="/auth/logout" onclick="localStorage.removeItem('jwtToken');">Cerrar sesión</a>
+			</div>
 
-			<p style="text-align: right;">
-				<a href="/auth/logout" onclick="localStorage.removeItem('jwtToken');">Cerrar sesión</a>
-			</p>
+			<table class="table" border="1" cellpadding="4" cellspacing="0">
+				<thead>
+					<tr>
+						<th>Numero</th>
+						<th>Tipo</th>
+						<th>Repetidas</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="lamina : ${laminasRepetidas}">
+						<td th:text="${lamina.numero}"></td>
+						<td th:text="${lamina.tipo}"></td>
+						<td th:text="${lamina.cantidadRepetidas}"></td>
+					</tr>
+				</tbody>
+			</table>
 
-			<p>
-		<p>
-			<span th:text="'Página ' + (${paginaActual} + 1) + ' de ' + (${totalPaginas == 0} ? 1 : ${totalPaginas})"></span>
-		</p>
-		<p>
-			<span th:if="${paginaActual > 0}">
-				<a th:href="@{/vista/albumes/{id}/laminas/repetidas(id=${album.id},pagina=${paginaActual - 1})}">Anterior</a>
-			</span>
-			<span th:unless="${paginaActual > 0}">Anterior</span>
+			<div th:if="${totalPaginas != null}">
+				<p>
+					<span th:text="'Página ' + (${paginaActual} + 1) + ' de ' + (${totalPaginas == 0} ? 1 : ${totalPaginas})"></span>
+				</p>
+				<p>
+					<span th:if="${paginaActual > 0}">
+						<a th:href="@{/vista/albumes/{id}/laminas/repetidas(id=${album.id},pagina=${paginaActual - 1})}">Anterior</a>
+					</span>
+					<span th:unless="${paginaActual > 0}">Anterior</span>
 
-			|
+					|
 
-			<span th:if="${paginaActual + 1 < totalPaginas}">
-				<a th:href="@{/vista/albumes/{id}/laminas/repetidas(id=${album.id},pagina=${paginaActual + 1})}">Siguiente</a>
-			</span>
-			<span th:unless="${paginaActual + 1 < totalPaginas}">Siguiente</span>
-		</p>
-	</div>
+					<span th:if="${paginaActual + 1 < totalPaginas}">
+						<a th:href="@{/vista/albumes/{id}/laminas/repetidas(id=${album.id},pagina=${paginaActual + 1})}">Siguiente</a>
+					</span>
+					<span th:unless="${paginaActual + 1 < totalPaginas}">Siguiente</span>
+				</p>
+			</div>
+		</section>
+
+		<footer class="footer">
+			<div class="stamp-left"></div>
+			<div class="stamp-right"></div>
+		</footer>
+	</main>
+</div>
 </body>
 </html>

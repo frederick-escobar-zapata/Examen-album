@@ -1,52 +1,84 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
-	<meta charset="UTF-8" />
-	<title th:text="'Laminas faltantes de ' + ${album.nombre}">Laminas faltantes</title>
+    <meta charset="UTF-8" />
+    <title th:text="'Láminas faltantes de ' + ${album.nombre}">Láminas faltantes</title>
+    <link rel="stylesheet" href="/css/login.css?v=2" />
 </head>
 <body>
-	<p style="text-align: right;">
-		<a href="/auth/logout" onclick="localStorage.removeItem('jwtToken');">Cerrar sesión</a>
-	</p>
-	<h1 th:text="'Laminas faltantes de ' + ${album.nombre}">Laminas faltantes</h1>
+<div class="page-bg">
+    <main class="login-wrapper">
+        <header class="login-header">
+            <div class="logo">Co-Lections</div>
+            <h1 th:text="'Láminas faltantes de ' + ${album.nombre}">Láminas faltantes</h1>
+        </header>
 
-	<p>
-		<a th:href="@{'/vista/albumes/' + ${album.id}}">Volver al Laminas</a> |
-		<a th:href="@{'/vista/albumes/' + ${album.id} + '/laminas'}">Ver todas las Laminas</a>
-	</p>
+        <section class="card">
+            <p class="top-actions" style="text-align: right;">
+                
+            </p>
 
-	<table border="1" cellpadding="4" cellspacing="0">
-		<thead>
-			<tr>
-				<th>Numero</th>
-				<th>Estado</th>
-			</tr>
-		</thead>
-		<tbody>
-			<tr th:each="lamina : ${laminasFaltantes}">
-				<td th:text="${lamina.numero}"></td>
-				<td th:text="${lamina.estado}"></td>
-			</tr>
-		</tbody>
-	</table>
+            <p>
+                <div class="bottom-actions">
+                    <p>
+                        <a th:href="@{'/vista/albumes/' + ${album.id}}" class="btn-link">
+                            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            <span>Volver al álbum</span>
+                        </a>
+                    </p>
+                    <a class="btn-danger" href="/auth/logout" onclick="localStorage.removeItem('jwtToken');">Cerrar sesión</a>
+                </div>
+            </p>
 
-	<div th:if="${totalPaginas != null}">
-		<p>
-			<span th:text="'Página ' + (${paginaActual} + 1) + ' de ' + (${totalPaginas == 0} ? 1 : ${totalPaginas})"></span>
-		</p>
-		<p>
-			<span th:if="${paginaActual > 0}">
-				<a th:href="@{/vista/albumes/{id}/laminas/faltantes(id=${album.id},pagina=${paginaActual - 1})}">Anterior</a>
-			</span>
-			<span th:unless="${paginaActual > 0}">Anterior</span>
+            <div th:if="${faltantes != null}">
+                <p>Listado de números faltantes:</p>
+                <ul>
+                    <li th:each="n : ${faltantes}" th:text="${n}"></li>
+                </ul>
+            </div>
 
-			|
+            <div th:if="${laminasFaltantes != null}">
+                <table class="table" border="1" cellpadding="4" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Numero</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="lamina : ${laminasFaltantes}">
+                            <td th:text="${lamina.numero}"></td>
+                            <td th:text="${lamina.estado}"></td>
+                        </tr>
+                    </tbody>
+                </table>
 
-			<span th:if="${paginaActual + 1 < totalPaginas}">
-				<a th:href="@{/vista/albumes/{id}/laminas/faltantes(id=${album.id},pagina=${paginaActual + 1})}">Siguiente</a>
-			</span>
-			<span th:unless="${paginaActual + 1 < totalPaginas}">Siguiente</span>
-		</p>
-	</div>
+                <div th:if="${totalPaginas != null}">
+                    <p>
+                        <span th:text="'Página ' + (${paginaActual} + 1) + ' de ' + (${totalPaginas == 0} ? 1 : ${totalPaginas})"></span>
+                    </p>
+                    <p>
+                        <span th:if="${paginaActual > 0}">
+                            <a th:href="@{/vista/albumes/{id}/laminas/faltantes(id=${album.id},pagina=${paginaActual - 1})}">Anterior</a>
+                        </span>
+                        <span th:unless="${paginaActual > 0}">Anterior</span>
+
+                        |
+
+                        <span th:if="${paginaActual + 1 < totalPaginas}">
+                            <a th:href="@{/vista/albumes/{id}/laminas/faltantes(id=${album.id},pagina=${paginaActual + 1})}">Siguiente</a>
+                        </span>
+                        <span th:unless="${paginaActual + 1 < totalPaginas}">Siguiente</span>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <footer class="footer">
+            <div class="stamp-left"></div>
+            <div class="stamp-right"></div>
+        </footer>
+    </main>
+</div>
 </body>
 </html>
